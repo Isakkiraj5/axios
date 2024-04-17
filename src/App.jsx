@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function App() {
@@ -12,6 +12,7 @@ function App() {
   });
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [error, setError] = useState('');
 
   // Fetch users data
   useEffect(() => {
@@ -30,6 +31,12 @@ function App() {
 
   // Add or edit a user
   const handleSubmit = () => {
+    // any form field is empty
+    if (!formData.name || !formData.email || !formData.phone) {
+      setError('Please fill out all fields');
+      return;
+    }
+
     if (editMode) {
       // Edit mode
       axios.put(`${baseUrl}/${editId}`, formData)
@@ -72,12 +79,13 @@ function App() {
 
   return (
     <div className="container mt-5">
-         <h2 className="mt-5">{editMode ? 'Edit User' : 'Add User'}</h2>
+      <h2 className="mt-5">{editMode ? 'Edit User' : 'Add User'}</h2>
+      {error && <div className="alert alert-danger">{error}</div>}
       <div className="row align-items-center">
         <div className="col-md-4">
           <input
             type="text"
-            className="form-control "
+            className="form-control"
             placeholder="Name"
             name="name"
             value={formData.name}
@@ -87,7 +95,7 @@ function App() {
         <div className="col-md-3">
           <input
             type="email"
-            className="form-control "
+            className="form-control"
             placeholder="Email"
             name="email"
             value={formData.email}
@@ -97,7 +105,7 @@ function App() {
         <div className="col-md-3">
           <input
             type="tel"
-            className="form-control "
+            className="form-control"
             placeholder="Phone"
             name="phone"
             value={formData.phone}
@@ -105,12 +113,12 @@ function App() {
           />
         </div>
         <div className="col-md-2">
-          <button className="btn btn-success " onClick={handleSubmit}>
-        {editMode ? 'Update User' : 'Add User'}
-      </button>
+          <button className="btn btn-success" onClick={handleSubmit}>
+            {editMode ? 'Update User' : 'Add User'}
+          </button>
         </div>
       </div>
-      
+
       <h1 className="mb-4">Users</h1>
       {loading ? (
         <div>Loading...</div>
@@ -123,18 +131,16 @@ function App() {
                   <h5 className="card-title">{user.name}</h5>
                   <p className="card-text">Email: {user.email}</p>
                   <p className="card-text">Phone: {user.phone}</p>
-                  <div className='d-flex align-items-center justify-content-cente'>
+                  <div className='d-flex align-items-center justify-content-center'>
                     <button className="btn btn-danger mx-4 mr-2" onClick={() => deleteUser(user.id)}>Delete</button>
-                  <button className="btn btn-primary" onClick={() => editUser(user)}>Edit</button>
+                    <button className="btn btn-primary" onClick={() => editUser(user)}>Edit</button>
                   </div>
-                 
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
-   
     </div>
   );
 }
